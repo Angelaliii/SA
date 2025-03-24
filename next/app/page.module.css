@@ -1,4 +1,4 @@
-.page {
+/* .page {
   --gray-rgb: 0, 0, 0;
   --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
   --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
@@ -12,9 +12,17 @@
   justify-items: center;
   min-height: 100svh;
   padding: 80px;
-  gap: 64px;
+  gap: 16px;
   font-family: var(--font-geist-sans);
+} */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  gap: 16px;
 }
+
 
 @media (prefers-color-scheme: dark) {
   .page {
