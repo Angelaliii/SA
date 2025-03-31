@@ -89,10 +89,10 @@ export default function Home() {
               variant="contained"
               color="secondary"
               component={Link}
-              href="/test"
+              href="/RegisterPage"
               size="large"
             >
-              DB_test
+              Re_test
             </Button>
           </Box>
         </Box>

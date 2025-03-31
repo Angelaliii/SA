@@ -1,94 +1,71 @@
-// src/Login.tsx
-"use client"; // 告訴 Next.js 這是客戶端組件
-
-import dynamic from "next/dynamic";
 import React, { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./firebaseconfig";
+import { toast } from "react-toastify";
 
-// 動態引入 MUI 組件，避免服務端渲染
-const TextField = dynamic(() => import("@mui/material/TextField"), {
-  ssr: false,
-});
-const Button = dynamic(() => import("@mui/material/Button"), { ssr: false });
-const Container = dynamic(() => import("@mui/material/Container"), {
-  ssr: false,
-});
-const Typography = dynamic(() => import("@mui/material/Typography"), {
-  ssr: false,
-});
-const Box = dynamic(() => import("@mui/material/Box"), { ssr: false });
 
-const Login: React.FC = () => {
-  // 定義狀態，用來存儲輸入的資料
+function Login(){
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
 
-  // 處理表單提交
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-
-    // 簡單的驗證
-    if (!email || !password) {
-      setError("請填寫所有欄位");
-      return;
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("User logged in Successfully");
+      toast.success("登入成功！", {
+        position: "top-center",
+      });
+      window.location.href = "./PlatformLanding"; // 可改為 useNavigate()
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error(error.message, {
+        position: "bottom-center",
+      });
     }
-
-    // 這裡可以加入 API 呼叫來驗證用戶
-    alert("登入成功！");
   };
 
   return (
-    <Container maxWidth="xs">
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: 3,
-          marginTop: 8,
-          borderRadius: 1,
-          boxShadow: 3,
-        }}
-      >
-        <Typography variant="h5" gutterBottom>
+    <form onSubmit={handleSubmit}>
+      <h3>登入</h3>
+
+      <div className="mb-3">
+        <label>Email</label>
+        <input
+          type="email"
+          className="form-control"
+          placeholder="請輸入 Email"
+          value={email}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
+        />
+      </div>
+
+      <div className="mb-3">
+        <label>密碼</label>
+        <input
+          type="password"
+          className="form-control"
+          placeholder="請輸入密碼"
+          value={password}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
+        />
+      </div>
+
+      <div className="d-grid">
+        <button type="submit" className="btn btn-primary">
           登入
-        </Typography>
+        </button>
+      </div>
 
-        {error && <Typography color="error">{error}</Typography>}
-
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="電子郵件"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <TextField
-            label="密碼"
-            type="password"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ marginTop: 2 }}
-          >
-            登入
-          </Button>
-        </form>
-      </Box>
-    </Container>
+      <p className="forgot-password text-right">
+        新用戶？<a href="./RegisterPage">點此註冊</a>
+      </p>
+    </form>
   );
-};
+}
 
 export default Login;
