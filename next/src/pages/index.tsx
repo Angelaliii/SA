@@ -84,6 +84,16 @@ export default function Home() {
             >
               文章發布
             </Button>
+
+            <Button
+              variant="contained"
+              color="secondary"
+              component={Link}
+              href="/test"
+              size="large"
+            >
+              DB_test
+            </Button>
           </Box>
         </Box>
       </Paper>
