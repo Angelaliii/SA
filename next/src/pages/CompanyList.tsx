@@ -1,5 +1,6 @@
-"use client";
+"use client"; // 表示此程式碼僅在客戶端執行
 
+// 引入必要的 MUI 組件和服務
 import {
   Alert,
   Box,
@@ -17,26 +18,27 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from "@mui/material";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import styles from "../assets/globals.module.css";
-import { companyServices } from "../firebase/services";
-import type { Company } from "../firebase/services/company-service";
+} from "@mui/material"; // MUI 組件
+import Link from "next/link"; // 用於 Next.js 路由導航
+import { useEffect, useState } from "react"; // React hooks
+import styles from "../assets/globals.module.css"; // 自定義樣式
+import { companyServices } from "../firebase/services"; // 公司服務層，用於從 Firebase 獲取公司資料
+import type { Company } from "../firebase/services/company-service"; // 引入公司資料類型
 
 export default function CompanyList() {
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  // 初始化狀態
+  const [companies, setCompanies] = useState<Company[]>([]); // 儲存公司資料
+  const [loading, setLoading] = useState<boolean>(true); // 儲存加載狀態
+  const [error, setError] = useState<string | null>(null); // 儲存錯誤訊息
   const [firebaseStatus, setFirebaseStatus] = useState<{ status: string }>({
     status: "連線中...",
-  });
+  }); // 儲存 Firebase 連線狀態
 
-  // 從 Firebase 獲取公司資料
+  // 使用 useEffect 在組件掛載時獲取公司資料
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        setLoading(true);
+        setLoading(true); // 開始加載
         console.log("從 Firebase 獲取公司資料...");
 
         // 檢查 Firebase 連線狀態
@@ -44,25 +46,26 @@ export default function CompanyList() {
           // 增加延遲以確保頁面完全載入且 Firebase 初始化
           await new Promise((resolve) => setTimeout(resolve, 500));
 
+          // 從 Firebase 獲取公司資料
           const companiesData = await companyServices.getAllCompanies();
           console.log("獲取的公司數量:", companiesData.length);
-          setCompanies(companiesData);
+          setCompanies(companiesData); // 更新公司資料
           setFirebaseStatus({
-            status: "連線正常",
+            status: "連線正常", // 連線正常
           });
         } catch (fetchErr) {
           console.error("Firebase 資料獲取失敗:", fetchErr);
           setFirebaseStatus({
-            status: "連線失敗",
+            status: "連線失敗", // 連線失敗
           });
 
-          // 提供更詳細的錯誤信息
+          // 顯示錯誤信息
           let errorMessage = "無法從 Firebase 獲取資料";
           if (fetchErr instanceof Error) {
             errorMessage = `Firebase 錯誤: ${fetchErr.message}`;
           }
           setError(errorMessage);
-          // 如果是認證錯誤，給出更具體的提示
+          // 如果是權限錯誤，顯示具體的錯誤提示
           if (
             fetchErr instanceof Error &&
             fetchErr.message.includes("permission-denied")
@@ -81,27 +84,27 @@ export default function CompanyList() {
         }
         setError(errorMessage);
       } finally {
-        setLoading(false);
+        setLoading(false); // 加載完成
       }
     };
 
-    // 設定延遲等待組件完全掛載
+    // 設定延遲以保證頁面完全掛載
     const timer = setTimeout(() => {
-      fetchCompanies();
+      fetchCompanies(); // 獲取公司資料
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(timer); // 清除延遲
   }, []);
 
-  // Format date for display
+  // 格式化日期
   const formatDate = (timestamp: string | null | undefined) => {
     if (!timestamp) return "N/A";
 
     try {
-      // Parse ISO date string
+      // 解析 ISO 格式的日期字符串
       return new Date(timestamp).toLocaleDateString("zh-TW");
     } catch (err) {
-      return "無效日期";
+      return "無效日期"; // 處理無效日期
     }
   };
 
@@ -109,6 +112,7 @@ export default function CompanyList() {
     <div className={styles.page}>
       <Container maxWidth="md">
         <Paper elevation={3} sx={{ p: 4, mt: 4, mb: 4 }}>
+          {/* 頁面標題和返回首頁按鈕 */}
           <Box
             sx={{
               display: "flex",
@@ -123,9 +127,8 @@ export default function CompanyList() {
             </Button>
           </Box>
 
+          {/* Firebase 連線狀態顯示 */}
           <Divider sx={{ mb: 3 }} />
-
-          {/* Firebase 狀態顯示 */}
           <Alert
             severity={firebaseStatus.status === "連線正常" ? "info" : "warning"}
             sx={{ mb: 2 }}
@@ -133,19 +136,23 @@ export default function CompanyList() {
             Firebase 狀態: {firebaseStatus.status}
           </Alert>
 
+          {/* 如果資料正在加載，顯示 CircularProgress 加載動畫 */}
           {loading ? (
             <Box sx={{ display: "flex", justifyContent: "center", my: 5 }}>
               <CircularProgress />
             </Box>
           ) : error ? (
+            // 如果有錯誤，顯示錯誤訊息
             <Box sx={{ textAlign: "center", my: 5 }}>
               <Alert severity="error">{error}</Alert>
             </Box>
           ) : companies.length === 0 ? (
+            // 如果沒有公司資料，顯示提示訊息
             <Box sx={{ textAlign: "center", my: 5 }}>
               <Typography>目前沒有公司資料</Typography>
             </Box>
           ) : (
+            // 如果有公司資料，顯示表格
             <>
               <TableContainer>
                 <Table>
@@ -167,6 +174,7 @@ export default function CompanyList() {
                         <TableCell>{company.industryType}</TableCell>
                         <TableCell>{company.contactName}</TableCell>
                         <TableCell>
+                          {/* 根據公司狀態顯示不同顏色的標籤 */}
                           <Box
                             sx={{
                               display: "inline-block",
@@ -203,6 +211,7 @@ export default function CompanyList() {
                 </Table>
               </TableContainer>
 
+              {/* 顯示公司詳細資料 */}
               <Typography variant="subtitle2" sx={{ mt: 4, mb: 2 }}>
                 詳細資訊
               </Typography>
@@ -216,6 +225,7 @@ export default function CompanyList() {
                       </Typography>
                       <Divider sx={{ my: 1 }} />
 
+                      {/* 顯示公司詳細資料 */}
                       <Box
                         sx={{
                           display: "grid",
@@ -297,6 +307,7 @@ export default function CompanyList() {
                         </Box>
                       </Box>
 
+                      {/* 顯示公司簡介 */}
                       {company.companyDescription && (
                         <Box sx={{ mb: 2 }}>
                           <Typography variant="body2" color="text.secondary">
@@ -308,6 +319,7 @@ export default function CompanyList() {
                         </Box>
                       )}
 
+                      {/* 顯示公司標誌和營業證明文件 */}
                       <Box sx={{ display: "flex", gap: 2 }}>
                         {company.logoURL && (
                           <Box>

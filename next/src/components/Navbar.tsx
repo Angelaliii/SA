@@ -2,6 +2,7 @@
 
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
+import LogoutIcon from "@mui/icons-material/Logout";
 import {
   AppBar,
   Box,
@@ -14,7 +15,8 @@ import {
   Typography,
 } from "@mui/material";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { authServices } from "../firebase/services"; // 假設 authServices 提供了登出功能
 
 const pages = [
   { name: "首頁", path: "/PlatformLanding" },
@@ -28,25 +30,55 @@ const userOptions = [
   { name: "社團註冊", path: "/ClubRegister" },
 ];
 
+const userLoggedInOptions = [
+  { name: "登出", path: "", icon: <LogoutIcon /> }, // 顯示登出選項
+];
+
 export default function Navbar() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 用來判斷用戶是否登入
 
+  // 開啟導航菜單
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
 
+  // 開啟用戶菜單
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
 
+  // 關閉導航菜單
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
 
+  // 關閉用戶菜單
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  // 登出處理
+  const handleLogout = async () => {
+    await authServices.logout(); // 調用登出方法
+    setIsLoggedIn(false); // 登出後設置為未登入
+    handleCloseUserMenu(); // 關閉用戶菜單
+  };
+
+  // 檢查用戶是否登入
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const user = await authServices.getCurrentUser(); // 假設有一個方法來檢查用戶狀態
+      if (user) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   return (
     <AppBar position="static">
@@ -98,6 +130,7 @@ export default function Navbar() {
               onClose={handleCloseNavMenu}
               sx={{
                 display: { xs: "block", md: "none" },
+                transition: "transform 0.3s ease-in-out", // 動畫效果
               }}
             >
               {pages.map((page) => (
@@ -140,7 +173,15 @@ export default function Navbar() {
                 component={Link}
                 href={page.path}
                 onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
+                sx={{
+                  my: 2,
+                  color: "white",
+                  display: "block",
+                  transition: "color 0.3s", // 動畫效果
+                  "&:hover": {
+                    color: "#f57c00", // 設定 hover 顏色
+                  },
+                }}
               >
                 {page.name}
               </Button>
@@ -157,7 +198,7 @@ export default function Navbar() {
               <AccountCircleIcon />
             </IconButton>
             <Menu
-              sx={{ mt: "45px" }}
+              sx={{ mt: "45px", transition: "transform 0.3s ease-in-out" }}
               id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{
@@ -172,16 +213,25 @@ export default function Navbar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {userOptions.map((option) => (
-                <MenuItem
-                  key={option.name}
-                  onClick={handleCloseUserMenu}
-                  component={Link}
-                  href={option.path}
-                >
-                  <Typography textAlign="center">{option.name}</Typography>
-                </MenuItem>
-              ))}
+              {isLoggedIn
+                ? userLoggedInOptions.map((option) => (
+                    <MenuItem
+                      key={option.name}
+                      onClick={handleLogout} // 登出處理
+                    >
+                      <Typography textAlign="center">{option.name}</Typography>
+                    </MenuItem>
+                  ))
+                : userOptions.map((option) => (
+                    <MenuItem
+                      key={option.name}
+                      onClick={handleCloseUserMenu}
+                      component={Link}
+                      href={option.path}
+                    >
+                      <Typography textAlign="center">{option.name}</Typography>
+                    </MenuItem>
+                  ))}
             </Menu>
           </Box>
         </Toolbar>

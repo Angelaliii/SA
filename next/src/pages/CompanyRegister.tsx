@@ -1,6 +1,6 @@
-"use client";
+"use client"; // 表明此程式碼僅在客戶端執行
 
-// 引入必要的套件和服務
+// 引入必要的 MUI 組件和 Firebase 方法
 import {
   Alert,
   Box,
@@ -10,18 +10,18 @@ import {
   Paper,
   TextField,
   Typography,
-} from "@mui/material";
+} from "@mui/material"; // MUI 組件
 import {
   createUserWithEmailAndPassword,
   fetchSignInMethodsForEmail,
-} from "firebase/auth";
-import Link from "next/link";
-import { ChangeEvent, FormEvent, useState } from "react";
-import styles from "../assets/globals.module.css";
-import { auth } from "../firebase/config";
-import { companyServices } from "../firebase/services";
+} from "firebase/auth"; // Firebase Auth 方法
+import Link from "next/link"; // Next.js 路由導航
+import { ChangeEvent, FormEvent, useState } from "react"; // React 狀態和事件處理
+import styles from "../assets/globals.module.css"; // 引入自定義的樣式
+import { auth } from "../firebase/config"; // Firebase 配置
+import { companyServices } from "../firebase/services"; // 公司服務層，用於儲存資料
 
-// 簡化的表單資料類型，新增密碼欄位
+// 定義表單資料的型別
 interface FormData {
   companyName: string;
   businessId: string;
@@ -30,7 +30,7 @@ interface FormData {
   confirmPassword: string;
 }
 
-// 簡化的表單錯誤類型，新增密碼錯誤
+// 定義表單錯誤的型別
 interface FormErrors {
   companyName: string;
   businessId: string;
@@ -49,7 +49,7 @@ export default function CompanyRegister() {
     confirmPassword: "",
   });
 
-  // 驗證錯誤
+  // 驗證錯誤狀態
   const [errors, setErrors] = useState<FormErrors>({
     companyName: "",
     businessId: "",
@@ -63,7 +63,7 @@ export default function CompanyRegister() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // 處理輸入變化
+  // 處理輸入變更
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -71,7 +71,7 @@ export default function CompanyRegister() {
       [name]: value,
     }));
 
-    // 清除錯誤
+    // 清除錯誤訊息
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
         ...prev,
@@ -80,7 +80,7 @@ export default function CompanyRegister() {
     }
   };
 
-  // 驗證統一編號格式 - 8位數字
+  // 驗證統一編號格式（8位數字）
   const validateBusinessId = (id: string) => {
     const regex = /^\d{8}$/;
     return regex.test(id);
@@ -92,7 +92,7 @@ export default function CompanyRegister() {
     return regex.test(email);
   };
 
-  // 驗證密碼強度 (至少8個字元，包含數字和字母)
+  // 驗證密碼強度（至少8個字元，包含字母和數字）
   const validatePassword = (password: string) => {
     const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     return regex.test(password);

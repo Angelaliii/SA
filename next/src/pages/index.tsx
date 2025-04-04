@@ -1,5 +1,6 @@
-import { Box, Button, Container, Paper, Typography } from "@mui/material";
-import Link from "next/link";
+// Home.tsx
+import { Box, Container, Paper, Typography } from "@mui/material";
+import NavButton from "../components/NavButton"; // 引入自定義的按鈕組件
 
 export default function Home() {
   return (
@@ -33,57 +34,15 @@ export default function Home() {
               gap: 2,
               justifyContent: "center",
               mt: 3,
+              flexDirection: { xs: "column", sm: "row" }, // 響應式設計：小螢幕時按鈕會排成一列，大螢幕時排成一行
             }}
           >
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              href="/LoginPage"
-              size="large"
-            >
-              帳號登入
-            </Button>
-
-            <Button
-              variant="contained"
-              color="secondary"
-              component={Link}
-              href="/CompanyRegister"
-              size="large"
-            >
-              企業註冊
-            </Button>
-
-            <Button
-              variant="contained"
-              color="secondary"
-              component={Link}
-              href="/ClubRegister"
-              size="large"
-            >
-              社團註冊
-            </Button>
-
-            <Button
-              variant="contained"
-              color="secondary"
-              component={Link}
-              href="/PlatformLanding"
-              size="large"
-            >
-              主頁
-            </Button>
-
-            <Button
-              variant="contained"
-              color="secondary"
-              component={Link}
-              href="/Artical"
-              size="large"
-            >
-              文章發布
-            </Button>
+            {/* 使用 NavButton 組件，傳入 href 和顯示文字 */}
+            <NavButton href="/LoginPage">帳號登入</NavButton>
+            <NavButton href="/CompanyRegister">企業註冊</NavButton>
+            <NavButton href="/ClubRegister">社團註冊</NavButton>
+            <NavButton href="/PlatformLanding">主頁</NavButton>
+            <NavButton href="/Artical">文章發布</NavButton>
           </Box>
         </Box>
       </Paper>
