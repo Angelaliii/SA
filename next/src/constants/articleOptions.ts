@@ -1,6 +1,6 @@
 // 文章相關的靜態選項
 // 文章發布位置選項
-export const postLocations = ["企業版", "社團版"];
+export const postLocations = ["最新消息", "找贊助"];
 
 // 可選標籤列表
 export const tagOptions = [

@@ -146,7 +146,7 @@ export default function useArticleForm() {
    */
   const validateBasicFields = (errors: ArticleFormErrors) => {
     if (!title) errors.title = "請輸入標題";
-    if (!content) errors.content = "請輸入內容";
+    if (!content) errors.content = "請輸入文章內容（可換行）";
     if (!postType) errors.postType = "請選擇文章類型";
   };
 
